@@ -68,7 +68,9 @@ router.post('/signup', async (req, res) => {
             
         } else {
             const hashed = await bcrypt.hash(password, 10)
+
             const shareId = Math.floor(Math.random() * 99999999)
+
             const code = Math.floor(Math.random() * 999999)
 
             const expirationTime = new Date();
@@ -117,7 +119,7 @@ router.post('/signup/guest', async (req, res) => {
         await newUser.save()
         console.log(newUser);
         
-        const token = jwt.sign({id: newUser._id}, process.env.JWT_SECRET_KEY, {expiresIn: "24h"})
+        const token = jwt.sign({id: newUser._id}, process.env.JWT_SECRET_KEY)
         res.status(200).json({token: token})
 
     } catch (error) {

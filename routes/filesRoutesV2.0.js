@@ -41,14 +41,14 @@ const generateFilename = (fileName) => {
     const lastDotIndex = fileName.lastIndexOf('.');
 
     if (lastDotIndex === -1 || lastDotIndex === 0) {
-        return `${fileName + String(randomNameId)}`;
+        return `${fileName} (${randomNameId})`;
     }
 
     const fileNameUTFNotExtension = fileName.substring(0, lastDotIndex)
     const fileExtension = fileName.substring(lastDotIndex + 1)
 
     console.log(`${fileName}${randomNameId}.${fileExtension}`);
-    return `${fileNameUTFNotExtension}${randomNameId}.${fileExtension}`;
+    return `${fileNameUTFNotExtension} (${randomNameId}).${fileExtension}`;
 }
 
 
@@ -63,6 +63,7 @@ const uploadS3 = multer({
 
     key: function (req, file, cb) {
       console.log(req);
+      
       const fileNameUTF = Buffer.from(file.originalname, 'latin1').toString('utf8');
       console.log(fileNameUTF);
 
@@ -104,7 +105,7 @@ router.post('/fileLoadNew/:id/', uploadS3.array('files'), authMidelwares, async 
         const expirationTime = new Date();
         expirationTime.setDate(expirationTime.getDate() + 14);
 
-        req.files.forEach(async (item, index) => {
+        req.files.forEach((item, index) => {
 
             const obj = {
                 id: Math.floor(Math.random() * 9999999999),

@@ -45,13 +45,6 @@ const userFileStory = require('./routes/userFileStory');
 
 // Could not connect to any servers in your MongoDB Atlas cluster. One common reason is that you're trying to access the database from an IP that isn't whitelisted. Make sure your current IP address is on your Atlas cluster's IP whitelist:
 
-// После предидущего решения возникла эта ошибка надо просто указать в MongoDB IP Хостенга 
-
-// Узнать IP можно с помощю "console.log(os.networkInterfaces());" 
-
-// нужно перейти в MongoDB Atlas -> Database & Network Access -> IP Access List и указать там IP хостенга
-
-
 
 // По мелочи
 
@@ -72,7 +65,7 @@ async function startMongoDBConnected() {
         connectionStateRecovery: {},
         cors: {
             // Разрешаем подключения с клиентского домена/порта
-            origin: "https://fileshare-one-rust.vercel.app", // <-- Не в коем случи не ставить в конце "/" !!!!!!
+            origin: ["https://fileshare-one-rust.vercel.app", "http://localhost:3000"], // <-- Не в коем случи не ставить в конце "/" !!!!!!
             methods: ["GET", "POST"],
         }
     });
