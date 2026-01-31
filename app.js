@@ -65,7 +65,7 @@ async function startMongoDBConnected() {
         connectionStateRecovery: {},
         cors: {
             // Разрешаем подключения с клиентского домена/порта
-            origin: ["https://fileshare-one-rust.vercel.app", "http://localhost:3000"], // <-- Не в коем случи не ставить в конце "/" !!!!!!
+            origin: ["https://fileshare-one-rust.vercel.app"], // <-- Не в коем случи не ставить в конце "/" !!!!!!
             methods: ["GET", "POST"],
         }
     });
