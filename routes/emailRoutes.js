@@ -114,6 +114,12 @@ router.post('/:option/email/verify', authMidelwares, async (req, res) => {
 
         const expirationTime = new Date(user.codeExpires)
 
+        console.log(user);
+        console.log(user.codeExpires);
+        console.log(expirationTime);
+        console.log(new Date());
+        
+
         if (expirationTime > new Date()) {
 
             if (user.verificationCode != code) {
@@ -233,7 +239,7 @@ router.get('/:option/email/cancel', authMidelwares, async (req, res) => {
 
         } else if (option == 'signup') {
 
-            const userDel = await Users.findByIdAndDelete({_id: userId}) //обезательно доделать
+            const userDel = await Users.findByIdAndDelete({_id: userId})
 
         } else {
             res.status(400).json({msg:'Ошибка при отмене, повторите попытку'});
@@ -247,7 +253,7 @@ router.get('/:option/email/cancel', authMidelwares, async (req, res) => {
     }
 });
 
-cron.schedule("0 0 * * * *", async () => {
+cron.schedule("0 */15 * * * *", async () => {
     try {
 
          
@@ -275,40 +281,6 @@ cron.schedule("0 0 * * * *", async () => {
         console.log(error);   
     }
 });
-
-
-async function init() {
-    try {
-
-         
-
-        const users = await Users.find()
-        
-        for (const user of users) {
-            
-            const expirationTime = new Date(user.codeExpires)
-
-            if (expirationTime < new Date()) {
-
-                user.emailNew = undefined
-                user.verificationCode = undefined
-                user.codeExpires = undefined
-
-                await user.save()
-
-                console.log("Код потвирждения удалён:", user.username);
-            }
-
-        };
-
-    } catch (error) {
-        console.log(error);   
-    }
-}
-
-init()
-
-
 
 
 module.exports = router;

@@ -48,56 +48,107 @@ async function sendVerificationSingUpCode(recipientEmail, code) {
 
 router.post('/signup', async (req, res) => {
     try {
-         
-        const {email, username, password} = req.body
 
+        const {email, username, password} = req.body
+        
         console.log(req.body);
         
+        const tokenReq = req.headers["authorization"]
+        console.log(tokenReq);
 
-        const existingUserEmail = await Users.findOne({email})
-        console.log(existingUserEmail);
 
-        const existingUserUsername = await Users.findOne({username})
-        console.log(existingUserUsername);
+        async function signUpNewUserFun() {
+            const existingUserEmail = await Users.findOne({email})
+            console.log(existingUserEmail);
 
-        if (existingUserEmail != null) {
-            res.status(400).json({msg: "Полизователь с этой почтай уже существует"})
-            
-        } else if (existingUserUsername != null) {
-            res.status(400).json({msg: `Имя пользователя ${username} уже зането`})
-            
+            const existingUserUsername = await Users.findOne({username})
+            console.log(existingUserUsername);
+
+            if (existingUserEmail != null) {
+                res.status(400).json({msg: "Полизователь с этой почтай уже существует"})
+                
+            } else if (existingUserUsername != null) {
+                res.status(400).json({msg: `Имя пользователя ${username} уже зането`})
+                
+            } else {
+                const hashed = await bcrypt.hash(password, 10)
+
+                const shareId = Math.floor(Math.random() * 99999999)
+
+                const code = Math.floor(Math.random() * 999999)
+
+                const expirationTime = new Date();
+                expirationTime.setTime(expirationTime.getTime() + (10 * 60 * 1000));
+
+                const newUser = new Users(
+                    {
+                        email: email,
+                        username: username, 
+                        password: hashed,
+                        shareId: shareId,
+                        avatar: { 
+                            '400': "https://sergay-air-bucket-one.s3.eu-north-1.amazonaws.com/avatars/default.png", 
+                            '1000': "https://sergay-air-bucket-one.s3.eu-north-1.amazonaws.com/avatars/default.png" 
+                        },
+                        isVerified: false,
+                        verificationCode: code,
+                        codeExpires: expirationTime,
+                    }
+                )
+                await newUser.save()
+                console.log(newUser);
+
+                await sendVerificationSingUpCode(email, code)
+                
+                const token = jwt.sign({id: newUser._id}, process.env.JWT_SECRET_KEY, {expiresIn: "24h"})
+                res.status(200).json({token: token})
+
+            }
+        }
+        
+         
+        if (!tokenReq) {
+            await signUpNewUserFun()
         } else {
-            const hashed = await bcrypt.hash(password, 10)
-
-            const shareId = Math.floor(Math.random() * 99999999)
-
-            const code = Math.floor(Math.random() * 999999)
-
-            const expirationTime = new Date();
-            expirationTime.setTime(expirationTime.getTime() + (10 * 60 * 1000));
-
-            const newUser = new Users(
-                {
-                    email: email,
-                    username: username, 
-                    password: hashed,
-                    shareId: shareId,
-                    avatar: { 
-                        '400': "https://sergay-air-bucket-one.s3.eu-north-1.amazonaws.com/avatars/default.png", 
-                        '1000': "https://sergay-air-bucket-one.s3.eu-north-1.amazonaws.com/avatars/default.png" 
-                    },
-                    isVerified: false,
-                    verificationCode: code,
-                    codeExpires: expirationTime,
-                }
-            )
-            await newUser.save()
-            console.log(newUser);
-
-            await sendVerificationSingUpCode(email, code)
             
-            const token = jwt.sign({id: newUser._id}, process.env.JWT_SECRET_KEY, {expiresIn: "24h"})
-            res.status(200).json({token: token})
+            const decoded = jwt.verify(tokenReq.split(" ")[1], process.env.JWT_SECRET_KEY)
+
+            const getGuestUser = await Users.findOne({_id: decoded.id})
+
+            if (getGuestUser.isGuest != true) {
+                await signUpNewUserFun()
+            } else {
+
+                const hashed = await bcrypt.hash(password, 10)
+
+                const code = Math.floor(Math.random() * 999999)
+
+                const expirationTime = new Date();
+                expirationTime.setTime(expirationTime.getTime() + (10 * 60 * 1000));
+
+
+                await Users.findByIdAndUpdate({_id: decoded.id}, 
+                    { 
+                        email: email,
+                        username: username, 
+                        password: hashed,
+                        avatar: { 
+                            '400': "https://sergay-air-bucket-one.s3.eu-north-1.amazonaws.com/avatars/default.png", 
+                            '1000': "https://sergay-air-bucket-one.s3.eu-north-1.amazonaws.com/avatars/default.png" 
+                        },
+                        isVerified: false,
+                        verificationCode: code,
+                        codeExpires: expirationTime,
+                    }
+                )
+
+                getGuestUser.isGuest = undefined;
+                await getGuestUser.save();
+
+                await sendVerificationSingUpCode(email, code)
+
+                res.status(200).json({})
+            }
 
         }
 

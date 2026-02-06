@@ -55,7 +55,16 @@ const userFileStory = require('./routes/userFileStory');
 
 
 
+
+
+// обеденить все функции для отправки кода патверждения в один js файл
+
+
+
 async function startMongoDBConnected() {
+
+    console.log('MongoDB connected...');
+    
 
     await connectDB()
     console.log('MongoDB connected')
@@ -65,7 +74,7 @@ async function startMongoDBConnected() {
         connectionStateRecovery: {},
         cors: {
             // Разрешаем подключения с клиентского домена/порта
-            origin: ["https://fileshare-one-rust.vercel.app"], // <-- Не в коем случи не ставить в конце "/" !!!!!!
+            origin: ["https://fileshare-one-rust.vercel.app", "http://localhost:3000"], // <-- Не в коем случи не ставить в конце "/" !!!!!!
             methods: ["GET", "POST"],
         }
     });

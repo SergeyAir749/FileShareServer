@@ -20,9 +20,6 @@ const s3Client = new S3Client({
     }
 })
 
-const connectDB = require('../lib/mongodb')
-
-
 router.get('/getUserData', authMidelwares, async (req, res, next) => {
     const userId = req.userId
 
@@ -32,9 +29,15 @@ router.get('/getUserData', authMidelwares, async (req, res, next) => {
         const user = await Users.findOne({_id: userId})
 
         if (user != null && user.isVerified != false && user.isDelete != true) {
+
             console.log(user);
             user.password = undefined
             res.status(200).json(user)
+
+        } else if (user != null && user.isVerified == false) {
+
+            res.status(500).json({msg: 'Почта не верифицирована'})
+            
         } else {
             res.status(500).json({msg: 'invalid data'})
         }
