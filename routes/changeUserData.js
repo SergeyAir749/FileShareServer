@@ -106,22 +106,6 @@ const uploadAvatar = multer({
 
 
 
-const generateFilename = (fileName) => {
-
-    const lastDotIndex = fileName.lastIndexOf('.');
-
-    if (lastDotIndex === -1 || lastDotIndex === 0) {
-        return `${randomNameId}`;
-    }
-
-    const fileExtension = fileName.substring(lastDotIndex + 1)
-
-    console.log(`${randomNameId}.${fileExtension}`);
-    return `${randomNameId}.${fileExtension}`;
-}
-
-
-
 const seveAvatarAndSetting = async (fileBuffer, format, animated, userId) => {
     
     let img1000 = ''
@@ -170,7 +154,6 @@ const seveAvatarAndSetting = async (fileBuffer, format, animated, userId) => {
                 fit: sharp.fit.cover,
                 position: sharp.gravity.center
             })
-            .gif({ dither: 0, colors: 256 })
             .toFormat(`${format}`)
             .toBuffer();
         

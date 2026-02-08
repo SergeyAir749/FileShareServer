@@ -25,13 +25,15 @@ const userFileStory = require('./routes/userFileStory');
 
 // Важно!
 
-// Почта работает и всё остальное API на хостиге "vercel" благодаря connectDB()
+// Почта и всё остальное API работает (auth, userData, changeUserData) на хостиге "vercel" благодаря connectDB()
 // В итоге нет ошибок по типу:
+
 
 
 // {"msg":"No recipients defined"}
 
-// sendVerificationSingUpCode(user.email, code) -> await sendVerificationSingUpCode(user.email, code)
+// sendVerificationSingUpCode(user.email, code)  ->  await sendVerificationSingUpCode(user.email, code)
+
 
 
 // Но возникает другая ошибка
@@ -40,16 +42,20 @@ const userFileStory = require('./routes/userFileStory');
 
 // Которая решается через connectDB()
 
-// Это решение работает таким образом что перед тем как обратится к базе данных он сначала подключается к неё заранее
 
+
+// Но возникла ещё одна ошибка
 
 // Could not connect to any servers in your MongoDB Atlas cluster. One common reason is that you're trying to access the database from an IP that isn't whitelisted. Make sure your current IP address is on your Atlas cluster's IP whitelist:
+
+// Я не правельно настройл connectDB()
+
+
 
 
 // По мелочи
 
 // WebSocet, API Файлов работает на другом хостиге "Render"
-
 
 //Вроде как всё работает (но я не уверен на сколько стабильно)
 

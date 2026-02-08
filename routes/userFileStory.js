@@ -8,6 +8,26 @@ const authMidelwares = require('../midelwares/authMidelwares')
 const connectDB = require('../lib/mongodb')
 
 
+
+
+// Story get CRUD
+
+router.get('/story/get', authMidelwares, async (req, res) => {
+    try {
+         
+        const userId = req.userId
+
+        const user = await Users.findOne({_id: userId})
+        console.log(user);
+
+        res.status(200).send(user.filseStoryGet);
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({msg: error.message})
+    }
+})
+
+
 router.post('/story/get/delete/:id', authMidelwares, async (req, res) => {
     console.log(req.body);
 
@@ -29,40 +49,6 @@ router.post('/story/get/delete/:id', authMidelwares, async (req, res) => {
     }
 });
 
-router.post('/files/send/delete/:id', authMidelwares, async (req, res) => {
-    console.log(req.body);
-
-    try {
-         
-        const { id } = req.params
-        const { userWillReceiveName } = req.body
-        const userId = req.userId
-
-        console.log(req.params);
-        console.log(req.body);
-
-        const userWillReceive = await Users.findOne({username: userWillReceiveName})
-        console.log(userWillReceive);
-
-        const newFilse = userWillReceive.filse.filter((item) => item.id != id)
-        userWillReceive.filse = newFilse
-        await userWillReceive.save()
-
-
-        const user = await Users.findOne({_id: userId})
-        console.log(user);
-
-        const newFilseStory = user.filseStorySend.filter((item) => item.id != id)
-        user.filseStorySend = newFilseStory
-        await user.save()
-
-
-        res.status(200).send({msg:'Отправка отменина'});
-    } catch (error) {
-        console.log(error);
-        res.status(500).json({msg: error.message})
-    }
-});
 
 router.post('/story/get/deleteAll/', authMidelwares, async (req, res) => {
     console.log(req.body);
@@ -87,6 +73,21 @@ router.post('/story/get/deleteAll/', authMidelwares, async (req, res) => {
 
 
 // Story send CRUD
+
+router.get('/story/send', authMidelwares, async (req, res) => {
+    try {
+         
+        const userId = req.userId
+
+        const user = await Users.findOne({_id: userId})
+        console.log(user);
+
+        res.status(200).send(user.filseStorySend);
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({msg: error.message})
+    }
+})
 
 router.post('/story/send/delete/:id', authMidelwares, async (req, res) => {
     console.log(req.body);
@@ -128,6 +129,45 @@ router.post('/story/send/deleteAll/', authMidelwares, async (req, res) => {
         res.status(500).json({msg: error.message})
     }
 });
+
+
+
+
+router.post('/files/send/delete/:id', authMidelwares, async (req, res) => {
+    console.log(req.body);
+
+    try {
+         
+        const { id } = req.params
+        const { userWillReceiveName } = req.body
+        const userId = req.userId
+
+        console.log(req.params);
+        console.log(req.body);
+
+        const userWillReceive = await Users.findOne({username: userWillReceiveName})
+        console.log(userWillReceive);
+
+        const newFilse = userWillReceive.filse.filter((item) => item.id != id)
+        userWillReceive.filse = newFilse
+        await userWillReceive.save()
+
+
+        const user = await Users.findOne({_id: userId})
+        console.log(user);
+
+        const newFilseStory = user.filseStorySend.filter((item) => item.id != id)
+        user.filseStorySend = newFilseStory
+        await user.save()
+
+
+        res.status(200).send({msg:'Отправка отменина'});
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({msg: error.message})
+    }
+});
+
 
 
 

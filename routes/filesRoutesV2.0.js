@@ -121,7 +121,7 @@ router.post('/fileLoadNew/:id/', uploadS3.array('files'), authMidelwares, async 
 
             // console.log(obj);
 
-            userWillReceive.filse.push(obj)
+            userWillReceive.filse.unshift(obj)
             filseStorySendNew.unshift(obj)
             console.log(sentToUser.filseStorySend);
         })
@@ -159,11 +159,12 @@ router.post('/textLoad/:id', authMidelwares, async (req, res) => {
         const { sentToUserId, textValue, data, device, username } = req.body
         const userId = req.userId
 
-        let filseStorySendNew = sentToUser.filseStorySend
-
+        
         const userWillReceive = await Users.findOne({shareId: id})
         const sentToUser = await Users.findOne({_id: userId})
 
+        let filseStorySendNew = sentToUser.filseStorySend
+        
         const expirationTime = new Date();
         expirationTime.setDate(expirationTime.getDate() + 14);
 
@@ -179,7 +180,7 @@ router.post('/textLoad/:id', authMidelwares, async (req, res) => {
             expirationTime: expirationTime
         }
 
-        userWillReceive.filse.push(obj)
+        userWillReceive.filse.unshift(obj)
         filseStorySendNew.unshift(obj)
         console.log(sentToUser.filseStorySend);
 
@@ -248,16 +249,8 @@ router.get('/getDownloadNew/:option/:shareId/:fileId', async (req, res) => {
                 await Users.findOneAndUpdate({shareId: getFile.sentToUserId}, {filseStorySend: filseStorySendNew})
                 console.log(filseStorySendNew);
 
-
-
-
-
-                // await sentToUserId.save()
-
                 console.log(sentToUserId);
                 
-
-                // console.log(getFile.filename);
 
                 const command = new GetObjectCommand({
                     Bucket: 'sergay-air-bucket-one',
@@ -277,8 +270,6 @@ router.get('/getDownloadNew/:option/:shareId/:fileId', async (req, res) => {
 
                 // использовать здесь .save() бесполезно записи не происходят
 
-
-
                 // Пльзователь принял файл, запись в историю получении
 
                 getFile.status = 'accepted'
@@ -287,9 +278,6 @@ router.get('/getDownloadNew/:option/:shareId/:fileId', async (req, res) => {
                 userShareId.filse = deleteFile
 
                 await Users.findOneAndUpdate({shareId: shareId}, {filseStoryGet: filseStoryGetNew, filse: deleteFile})
-
-
-
 
 
                 // переписываем статус файла, для отправителя
@@ -304,9 +292,6 @@ router.get('/getDownloadNew/:option/:shareId/:fileId', async (req, res) => {
                 console.log(filseStorySendNew);
 
 
-
-
-                
 
                 res.send({msg:'Текст принет'});
             } else {
