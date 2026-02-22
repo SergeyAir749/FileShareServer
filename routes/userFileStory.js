@@ -5,11 +5,6 @@ require('dotenv').config();
 const Users = require('../moduls/Users')
 const authMidelwares = require('../midelwares/authMidelwares')
 
-const connectDB = require('../lib/mongodb')
-
-
-
-
 // Story get CRUD
 
 router.get('/story/get', authMidelwares, async (req, res) => {
@@ -139,29 +134,39 @@ router.post('/files/send/delete/:id', authMidelwares, async (req, res) => {
     try {
          
         const { id } = req.params
-        const { userWillReceiveName } = req.body
+        const { userWillReceiveId } = req.body
         const userId = req.userId
 
         console.log(req.params);
         console.log(req.body);
 
-        const userWillReceive = await Users.findOne({username: userWillReceiveName})
+        const userWillReceive = await Users.findOne({username: userWillReceiveId})
+
         console.log(userWillReceive);
+        console.log(userWillReceive.filse);
+        
+        const getFile = userWillReceive.filse.find((item) => item.id == id)
 
-        const newFilse = userWillReceive.filse.filter((item) => item.id != id)
-        userWillReceive.filse = newFilse
-        await userWillReceive.save()
+        if (getFile != undefined) {
 
+            const newFilse = userWillReceive.filse.filter((item) => item.id != id)
+            userWillReceive.filse = newFilse
+            await userWillReceive.save()
+    
+    
+            const user = await Users.findOne({_id: userId})
+            console.log(user);
+    
+            const newFilseStory = user.filseStorySend.filter((item) => item.id != id)
+            user.filseStorySend = newFilseStory
+            await user.save()
+    
+            res.status(200).send({msg:'Отправка отменина'});
 
-        const user = await Users.findOne({_id: userId})
-        console.log(user);
+        } else {
+            res.status(400).send({msg:'Ошибка не удалось отмены отправки'});
+        }
 
-        const newFilseStory = user.filseStorySend.filter((item) => item.id != id)
-        user.filseStorySend = newFilseStory
-        await user.save()
-
-
-        res.status(200).send({msg:'Отправка отменина'});
     } catch (error) {
         console.log(error);
         res.status(500).json({msg: error.message})

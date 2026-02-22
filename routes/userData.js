@@ -32,6 +32,9 @@ router.get('/getUserData', authMidelwares, async (req, res, next) => {
 
             console.log(user);
             user.password = undefined
+            user.filse = undefined
+            user.filseStoryGet = undefined
+            user.filseStorySend = undefined
             res.status(200).json(user)
 
         } else if (user != null && user.isVerified == false) {

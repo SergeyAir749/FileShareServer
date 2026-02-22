@@ -115,6 +115,7 @@ router.post('/fileLoadNew/:id/', uploadS3.array('files'), authMidelwares, async 
                 status: 'sent',
                 sentToUserId: sentToUserId,
                 sentToUser: username,
+                userWillReceiveId: userWillReceive._id,
                 userWillReceive: userWillReceive.username,
                 expirationTime: expirationTime
             }
@@ -210,21 +211,25 @@ router.get('/getDownloadNew/:option/:shareId/:fileId', async (req, res) => {
         console.log(req.params);
         
         const { shareId, fileId, option } = req.params
+
+        // Ищет пользователя который хочет скачать файл
     
         const userShareId = await Users.findOne({shareId: shareId})
         const filse = userShareId.filse
 
+        // Проверяет существует ли этот файл,
+
         const getFile = filse.find((item) => item.id == fileId)
         const deleteFile = filse.filter((item) => item.id != fileId)
         
+        console.log('getFile: ', getFile);
+        console.log('deleteFile: ', deleteFile); 
+        
         if (option == 'file') {
+
             if (getFile != undefined) {
 
-                
-
                 // использовать здесь .save() бесполезно записи не происходят
-
-
 
                 // Пльзователь принял файл, запись в историю получении
 
@@ -235,18 +240,17 @@ router.get('/getDownloadNew/:option/:shareId/:fileId', async (req, res) => {
 
                 await Users.findOneAndUpdate({shareId: shareId}, {filseStoryGet: filseStoryGetNew, filse: deleteFile})
 
-
-
+                
 
                 // переписываем статус файла, для отправителя
 
-                const sentToUserId = await Users.findOne({shareId: getFile.sentToUserId})
+                const sentToUserId = await Users.findOne({_id: getFile.sentToUserId})
                 const filseStorySendNew = sentToUserId.filseStorySend
                 
                 const reStatus = filseStorySendNew.find(file => file.id == fileId)
 
                 reStatus.status = 'accepted'
-                await Users.findOneAndUpdate({shareId: getFile.sentToUserId}, {filseStorySend: filseStorySendNew})
+                await Users.findOneAndUpdate({_id: getFile.sentToUserId}, {filseStorySend: filseStorySendNew})
                 console.log(filseStorySendNew);
 
                 console.log(sentToUserId);
@@ -263,6 +267,7 @@ router.get('/getDownloadNew/:option/:shareId/:fileId', async (req, res) => {
             } else {
                 res.send({msg:'Файл не найден'});
             }            
+
         } else if (option == 'text') {
 
             if (getFile != undefined) {
@@ -282,13 +287,13 @@ router.get('/getDownloadNew/:option/:shareId/:fileId', async (req, res) => {
 
                 // переписываем статус файла, для отправителя
 
-                const sentToUserId = await Users.findOne({shareId: getFile.sentToUserId})
+                const sentToUserId = await Users.findOne({_id: getFile.sentToUserId})
                 const filseStorySendNew = sentToUserId.filseStorySend
                 
                 const reStatus = filseStorySendNew.find(file => file.id == fileId)
 
                 reStatus.status = 'accepted'
-                await Users.findOneAndUpdate({shareId: getFile.sentToUserId}, {filseStorySend: filseStorySendNew})
+                await Users.findOneAndUpdate({_id: getFile.sentToUserId}, {filseStorySend: filseStorySendNew})
                 console.log(filseStorySendNew);
 
 
@@ -330,7 +335,7 @@ router.post('/files/cancel/:shareId',authMidelwares, async (req, res) => {
 
             for (const file of user.filse) {
 
-                const sentToUser = await Users.findOne({shareId: file.sentToUserId})
+                const sentToUser = await Users.findOne({_id: file.sentToUserId})
                 let filseStorySendNew = sentToUser.filseStorySend
 
                 if (sentToUser != null) {
@@ -343,7 +348,7 @@ router.post('/files/cancel/:shareId',authMidelwares, async (req, res) => {
                         newFilseFind.status = 'refusal'
                         console.log('filseStorySendNew ', filseStorySendNew);
                         
-                        await Users.findOneAndUpdate({shareId: file.sentToUserId}, {filseStorySend: filseStorySendNew})
+                        await Users.findOneAndUpdate({_id: file.sentToUserId}, {filseStorySend: filseStorySendNew})
                     } else {
                     
                     }
@@ -388,7 +393,8 @@ router.post('/files/cancel/:shareId/:id', authMidelwares, async (req, res) => {
             const newFilseFind = user.filse.find((item) => item.id == id)
             const newFilseFilter = user.filse.filter((item) => item.id != id)
 
-            const sentToUser = await Users.findOne({shareId: newFilseFind.sentToUserId})
+            const sentToUser = await Users.findOne({_id: newFilseFind.sentToUserId})
+            console.log(sentToUser);
             let filseStorySendNew = sentToUser.filseStorySend
             console.log('filseStorySend', filseStorySendNew);
             
@@ -402,17 +408,16 @@ router.post('/files/cancel/:shareId/:id', authMidelwares, async (req, res) => {
                     newFilseFind.status = 'refusal'
                     console.log('filseStorySendNew ', filseStorySendNew);
                     
-                    await Users.findOneAndUpdate({shareId: newFilseFind.sentToUserId}, {filseStorySend: filseStorySendNew})
+                    await Users.findOneAndUpdate({_id: newFilseFind.sentToUserId}, {filseStorySend: filseStorySendNew})
                 } else {
-                
+                    res.status(500).send({msg: 'Отпровитель файла не найден'}); 
                 }
 
             } else {
                 
             }
 
-            user.filse = newFilseFilter
-            await user.save()
+            await Users.findOneAndUpdate({_id: userId}, {filse: newFilseFilter})
 
         } else {
             res.status(500).send({msg: 'Ошибка Что-то пошло не так'}); 

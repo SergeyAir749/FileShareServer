@@ -67,6 +67,23 @@ const userFileStory = require('./routes/userFileStory');
 
 
 
+
+// sentToUserId - для статусов
+
+// userWillReceiveId - Отмена отправки
+
+
+// Исправел недочот:
+
+// sentToUserId - Вменсо ShareId записывается ObjectId()  (Обычные pапрос к серверу)
+// userWillReceiveName -> userWillReceiveId - Вменсо имени пользователя записывается ObjectId()  (ВебСокеты)
+
+
+
+
+
+
+
 async function startMongoDBConnected() {
 
     console.log('MongoDB connected...');
@@ -80,7 +97,7 @@ async function startMongoDBConnected() {
         connectionStateRecovery: {},
         cors: {
             // Разрешаем подключения с клиентского домена/порта
-            origin: ["https://fileshare-one-rust.vercel.app"], // <-- Не в коем случи не ставить в конце "/" !!!!!!
+            // origin: ["https://fileshare-one-rust.vercel.app"], // <-- Не в коем случи не ставить в конце "/" !!!!!!
             methods: ["GET", "POST"],
         }
     });
@@ -93,10 +110,20 @@ async function startMongoDBConnected() {
             console.log('user disconnected');
         });
     
+        socket.on('pingfilesUserId', async (id) => {
+            
+            const user = await users.findOne({_id: id}) 
+    
+            socket.join(user.shareId);
+    
+            const files = user.filse
+            
+            io.to(user.shareId).emit("files", files);
+        });
+
         socket.on('pingfilesShareId', async (shareId) => {
             socket.join(shareId);
              
-    
             const user = await users.findOne({shareId: shareId}) 
             const files = user.filse
             
