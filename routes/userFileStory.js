@@ -140,7 +140,7 @@ router.post('/files/send/delete/:id', authMidelwares, async (req, res) => {
         console.log(req.params);
         console.log(req.body);
 
-        const userWillReceive = await Users.findOne({username: userWillReceiveId})
+        const userWillReceive = await Users.findOne({_id: userWillReceiveId})
 
         console.log(userWillReceive);
         console.log(userWillReceive.filse);

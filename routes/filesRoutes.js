@@ -169,6 +169,14 @@ router.post('/textLoad/:id', authMidelwares, async (req, res) => {
         const expirationTime = new Date();
         expirationTime.setDate(expirationTime.getDate() + 14);
 
+        let userWillReceiveName = ''
+
+        if (userWillReceive.username != undefined) {
+            userWillReceiveName = userWillReceive.username
+        } else {
+            userWillReceiveName = 'Гость'
+        }
+
         const obj = {
             id: Math.floor(Math.random() * 9999999999),
             text: textValue,
@@ -177,7 +185,7 @@ router.post('/textLoad/:id', authMidelwares, async (req, res) => {
             status: 'sent',
             sentToUserId: sentToUserId,
             sentToUser: username,
-            userWillReceive: userWillReceive.username,
+            userWillReceive: userWillReceiveName,
             expirationTime: expirationTime
         }
 

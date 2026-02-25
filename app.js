@@ -14,7 +14,7 @@ const os = require('os');
 const emailRoutes = require('./routes/emailRoutes')
 const authRoutes = require('./routes/authRoutes')
 const changeUserData = require('./routes/changeUserData')
-const filesRoutes = require('./routes/filesRoutesV2.0')
+const filesRoutes = require('./routes/filesRoutes')
 const userData = require('./routes/userData')
 const userFileStory = require('./routes/userFileStory');
 
