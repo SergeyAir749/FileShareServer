@@ -109,7 +109,7 @@ router.get('/images/avatars/:id', async (req, res, next) => {
 });
 
 
-router.post('/account/delete', authMidelwares, async (req, res, next) => {
+router.post('/account/delete/session', authMidelwares, async (req, res, next) => {
     const userId = req.userId
     const { password } = req.body
 
