@@ -277,7 +277,7 @@ router.put('/change/email', authMidelwares, async (req, res) => {
 
             res.status(200).json({msg:'Код отправлен'});   
         } else {
-            res.status(400).json({msg: "Полизователь с такой почтой уже существует"})
+            res.status(400).json({msg: "Пользователь с такой почтой уже существует"})
         }
 
     } catch (error) {

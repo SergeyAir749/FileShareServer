@@ -1,12 +1,12 @@
 const jwt = require('jsonwebtoken')
 
 const authMidelwares = (req, res, next) => {
+
     // console.log(req.headers);
     // console.log(req.body);
-
+    console.log(req.headers["authorization"]);
     const tokenReq = req.headers["authorization"]
     console.log(tokenReq);
-    
 
     if (!tokenReq) {
         return res.status(401).json({msg: "No token"})

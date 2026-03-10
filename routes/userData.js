@@ -42,7 +42,7 @@ router.get('/getUserData', authMidelwares, async (req, res, next) => {
             res.status(500).json({msg: 'Почта не верифицирована'})
             
         } else {
-            res.status(500).json({msg: 'invalid data'})
+            res.status(500).json({msg: 'Что-то пошло не так'})
         }
 
 
@@ -50,6 +50,29 @@ router.get('/getUserData', authMidelwares, async (req, res, next) => {
         res.status(500).json({msg: error.message})
     }
 });
+
+
+router.get('/user/isguest', authMidelwares, async (req, res, next) => {
+
+    const userId = req.userId
+
+    try {
+        
+        const user = await Users.findOne({_id: userId})
+
+        if (user.isGuest == true) {
+            res.status(200).json({ isGuest: true })
+        } else {
+            res.status(200).json({ isGuest: false })
+        }
+
+
+    } catch (error) {
+        res.status(500).json({msg: error.message})
+    }
+
+});
+
 
 router.get('/getUserDataById/:id', async (req, res, next) => {
 

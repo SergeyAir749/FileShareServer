@@ -81,7 +81,7 @@ const uploadS3 = multer({
 
 
 
-router.post('/fileLoadNew/:id/', uploadS3.array('files'), authMidelwares, async (req, res) => {
+router.post('/fileLoad/:id/', uploadS3.array('files'), authMidelwares, async (req, res) => {
     try {
          
 
@@ -100,6 +100,14 @@ router.post('/fileLoadNew/:id/', uploadS3.array('files'), authMidelwares, async 
         const userWillReceive = await Users.findOne({shareId: id})
         const sentToUser = await Users.findOne({_id: userId})
 
+        let userWillReceiveName = ''
+
+        if (userWillReceive.username != undefined) {
+            userWillReceiveName = userWillReceive.username
+        } else {
+            userWillReceiveName = 'Гость'
+        }
+
         let filseStorySendNew = sentToUser.filseStorySend
 
         const expirationTime = new Date();
@@ -116,7 +124,7 @@ router.post('/fileLoadNew/:id/', uploadS3.array('files'), authMidelwares, async 
                 sentToUserId: sentToUserId,
                 sentToUser: username,
                 userWillReceiveId: userWillReceive._id,
-                userWillReceive: userWillReceive.username,
+                userWillReceive: userWillReceiveName,
                 expirationTime: expirationTime
             }
 
@@ -185,6 +193,7 @@ router.post('/textLoad/:id', authMidelwares, async (req, res) => {
             status: 'sent',
             sentToUserId: sentToUserId,
             sentToUser: username,
+            userWillReceiveId: userWillReceive._id,
             userWillReceive: userWillReceiveName,
             expirationTime: expirationTime
         }

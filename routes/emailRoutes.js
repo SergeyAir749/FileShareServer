@@ -237,13 +237,15 @@ router.get('/:option/email/cancel', authMidelwares, async (req, res) => {
             user.emailNew = undefined
             await user.save()
 
-        } else if (option == 'signup') {
-
-            const userDel = await Users.findByIdAndDelete({_id: userId})
-
         } else {
             res.status(400).json({msg:'Ошибка при отмене, повторите попытку'});
         }
+
+        // else if (option == 'signup') {
+
+        //     const userDel = await Users.findByIdAndDelete({_id: userId})
+
+        // }
 
         res.status(200).json({msg:'Верификацыя отменина'});
 

@@ -12,6 +12,13 @@ const connectDB = require('../lib/mongodb')
 
 // service: 'gmail', //Gmail
 
+// Когда-то был сломон по тому что в EMAIL_PASS в пароле были певидимые символы для раздиления
+// Пример: pppp pppp pppp pppp
+// Это так называемый "Неразрывный пробел", Юникод: U+00A0, HTML: &nbsp
+
+// Важно чтоб в пароле этих символов не было
+
+
 let transporter = nodemailer.createTransport({
     host: 'smtp.gmail.com',
     port: 465, //587
@@ -58,14 +65,16 @@ router.post('/signup', async (req, res) => {
 
 
         async function signUpNewUserFun() {
-            const existingUserEmail = await Users.findOne({email})
+            const existingUserEmail = await Users.findOne({email: email})
+            console.log('existingUserEmail');
             console.log(existingUserEmail);
 
-            const existingUserUsername = await Users.findOne({username})
+            const existingUserUsername = await Users.findOne({username: username})
+            console.log('existingUserUsername');
             console.log(existingUserUsername);
 
             if (existingUserEmail != null) {
-                res.status(400).json({msg: "Полизователь с этой почтай уже существует"})
+                res.status(400).json({msg: "Пользователь с этой почтай уже существует"})
                 
             } else if (existingUserUsername != null) {
                 res.status(400).json({msg: `Имя пользователя ${username} уже зането`})
@@ -106,51 +115,9 @@ router.post('/signup', async (req, res) => {
             }
         }
         
-         
-        if (!tokenReq) {
-            await signUpNewUserFun()
-        } else {
-            
-            const decoded = jwt.verify(tokenReq.split(" ")[1], process.env.JWT_SECRET_KEY)
+        
+        await signUpNewUserFun()
 
-            const getGuestUser = await Users.findOne({_id: decoded.id})
-
-            if (getGuestUser.isGuest != true) {
-                await signUpNewUserFun()
-            } else {
-
-                const hashed = await bcrypt.hash(password, 10)
-
-                const code = Math.floor(Math.random() * 999999)
-
-                const expirationTime = new Date();
-                expirationTime.setTime(expirationTime.getTime() + (10 * 60 * 1000));
-
-
-                await Users.findByIdAndUpdate({_id: decoded.id}, 
-                    { 
-                        email: email,
-                        username: username, 
-                        password: hashed,
-                        avatar: { 
-                            '400': "https://sergay-air-bucket-one.s3.eu-north-1.amazonaws.com/avatars/default.png", 
-                            '1000': "https://sergay-air-bucket-one.s3.eu-north-1.amazonaws.com/avatars/default.png" 
-                        },
-                        isVerified: false,
-                        verificationCode: code,
-                        codeExpires: expirationTime,
-                    }
-                )
-
-                getGuestUser.isGuest = undefined;
-                await getGuestUser.save();
-
-                await sendVerificationSingUpCode(email, code)
-
-                res.status(200).json({})
-            }
-
-        }
 
     } catch (error) {
         res.status(500).json({msg: error.message})
@@ -178,6 +145,78 @@ router.post('/signup/guest', async (req, res) => {
     }
 })
 
+router.post('/guest/update', async (req, res) => {
+    
+    const {email, username, password} = req.body
+
+    console.log(req.body);
+
+    const existingUserEmail = await Users.findOne({email: email})
+    console.log('existingUserEmail');
+    console.log(existingUserEmail);
+
+    const existingUserUsername = await Users.findOne({username: username})
+    console.log('existingUserUsername');
+    console.log(existingUserUsername);
+
+    if (existingUserEmail != null) {
+        res.status(400).json({msg: "Пользователь с этой почтай уже существует"})
+        
+    } else if (existingUserUsername != null) {
+        res.status(400).json({msg: `Имя пользователя ${username} уже зането`})
+        
+    } else {
+    
+        const tokenReq = req.headers["authorization"]
+        console.log(tokenReq);
+
+        const decoded = jwt.verify(tokenReq.split(" ")[1], process.env.JWT_SECRET_KEY)
+
+        const getGuestUser = await Users.findOne({_id: decoded.id})
+
+
+        // В случии если пользователь уже авторизован и хочет зарегистрировать новый аккаунт
+        // если этот пользователь не являентся гостям то ему зарегистрируют новый аккаунт
+
+        if (getGuestUser.isGuest != true) {
+            res.status(400).json({msg: 'Пользователь не является гостям'})
+        } else {
+
+            const hashed = await bcrypt.hash(password, 10)
+
+            const code = Math.floor(Math.random() * 999999)
+
+            const expirationTime = new Date();
+            expirationTime.setTime(expirationTime.getTime() + (10 * 60 * 1000));
+
+
+            await Users.findByIdAndUpdate({_id: decoded.id}, 
+                { 
+                    email: email,
+                    username: username, 
+                    password: hashed,
+                    avatar: { 
+                        '400': "https://sergay-air-bucket-one.s3.eu-north-1.amazonaws.com/avatars/default.png", 
+                        '1000': "https://sergay-air-bucket-one.s3.eu-north-1.amazonaws.com/avatars/default.png" 
+                    },
+                    isVerified: false,
+                    verificationCode: code,
+                    codeExpires: expirationTime,
+                }
+            )
+
+            getGuestUser.isGuest = undefined;
+            await getGuestUser.save();
+
+            await sendVerificationSingUpCode(email, code)
+
+            res.status(200).json({})
+        }
+    }
+
+
+});
+
 router.post('/login', async (req, res) => {
     try {
          
@@ -185,9 +224,9 @@ router.post('/login', async (req, res) => {
         let userData = null
 
         if (email == '') {
-            userData = await Users.findOne({username})
+            userData = await Users.findOne({username: username})
         } else if (username == '') {
-            userData = await Users.findOne({email})
+            userData = await Users.findOne({email: email})
         }
 
         if (!userData) {
