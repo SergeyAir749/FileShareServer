@@ -9,6 +9,7 @@ const authMidelwares = (req, res, next) => {
     console.log(tokenReq);
 
     if (!tokenReq) {
+        console.log({msg: "No token"});
         return res.status(401).json({msg: "No token"})
     }
 
@@ -19,6 +20,7 @@ const authMidelwares = (req, res, next) => {
         req.decoded = decoded
         next()
     } catch (error) {
+        console.log({msg: "invalid token"});
         return res.status(401).json({msg: "invalid token"}) 
     }
 }
