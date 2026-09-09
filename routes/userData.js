@@ -146,7 +146,7 @@ router.get('/getUserData', authMidelwares, async (req, res, next) => {
             res.cookie('token', token, {
                 httpOnly: true,
                 secure: isProduction, // process.env.SECURE_COOKIE === 'production', // true только в продакшене
-                sameSite: isProduction ? 'none' : 'lax', // Для локальной разработки на разных портах
+                sameSite: isProduction ? 'lax' : 'lax', // Для локальной разработки на разных портах
                 maxAge: 24 * 60 * 60 * 1000, // 24 часа в миллисекундах
                 path: '/',
             });
@@ -453,7 +453,7 @@ router.post('/account/recovering/verification', authMidelwares, async (req, res,
                     res.cookie('token', token, {
                         httpOnly: true,
                         secure: isProduction, // process.env.SECURE_COOKIE === 'production', // true только в продакшене
-                        sameSite: isProduction ? 'none' : 'lax', // Для локальной разработки на разных портах
+                        sameSite: isProduction ? 'lax' : 'lax', // Для локальной разработки на разных портах
                         maxAge: 24 * 60 * 60 * 1000, // 24 часа в миллисекундах
                         path: '/',
                     });
@@ -527,7 +527,7 @@ router.post('/account/recovering', async (req, res, next) => {
                         secure: isProduction, // true только в продакшене
                         maxAge: 24 * 60 * 60 * 1000, // 24 часа в миллисекундах
                         httpOnly: true,
-                        sameSite: isProduction ? 'none' : 'lax', // Для локальной разработки на разных портах
+                        sameSite: isProduction ? 'lax' : 'lax', // Для локальной разработки на разных портах
                         path: '/',
                     });
     
