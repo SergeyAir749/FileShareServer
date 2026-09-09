@@ -100,7 +100,8 @@ async function startMongoDBConnected() {
       origin: [
         "https://fileshareclient.netlify.app",
         "https://fileshare-one-rust.vercel.app",
-        "https://fileshareclientv2.onrender.com", // <-- Не в коем случи не ставить в конце "/" !!!!!!  //, "http://localhost:3000"
+        "https://fileshareclientv2.onrender.com", // <-- Не в коем случи не ставить в конце "/" !!!!!! 
+        "http://localhost:3000"
       ], 
       methods: ["GET", "POST"],
     },
@@ -190,6 +191,7 @@ async function startMongoDBConnected() {
         "https://fileshareclient.netlify.app",
         "https://fileshare-one-rust.vercel.app",
         "https://fileshareclientv2.onrender.com",
+        "http://localhost:3000"
       ],
       credentials: true
     }),

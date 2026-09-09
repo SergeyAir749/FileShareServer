@@ -143,7 +143,8 @@ router.post('/signup', async (req, res) => {
                     httpOnly: true,
                     secure: isProduction, // process.env.SECURE_COOKIE === 'production', // true только в продакшене
                     sameSite: isProduction ? 'none' : 'lax', // Для локальной разработки на разных портах
-                    maxAge: 24 * 60 * 60 * 1000 // 24 часа в миллисекундах
+                    maxAge: 24 * 60 * 60 * 1000, // 24 часа в миллисекундах
+                    path: '/',
                 });
 
 
@@ -184,6 +185,7 @@ router.post('/signup/guest', async (req, res) => {
             maxAge: 60 * 60 * 24 * 365, // 365 дней в милисикундах
             httpOnly: true,
             sameSite: isProduction ? 'none' : 'lax', // Для локальной разработки на разных портах
+            path: '/',
         });
 
         res.cookie('recoveringGuestToken', token, {
@@ -191,6 +193,7 @@ router.post('/signup/guest', async (req, res) => {
             secure: isProduction, // true только в продакшене
             sameSite: isProduction ? 'none' : 'lax', // Для локальной разработки на разных портах
             maxAge: 60 * 60 * 24 * 365, // 365 дней в милисикундах
+            path: '/',
         });
 
         res.status(200).json({ msg: 'Гостивой аккаунт зарегистрирован' })
@@ -315,7 +318,8 @@ router.post('/login', async (req, res) => {
                         httpOnly: true,
                         secure: isProduction, // process.env.SECURE_COOKIE === 'production', // true только в продакшене
                         sameSite: isProduction ? 'none' : 'lax', // Для локальной разработки на разных портах
-                        maxAge: 24 * 60 * 60 * 1000 // 24 часа в миллисекундах
+                        maxAge: 24 * 60 * 60 * 1000, // 24 часа в миллисекундах
+                        path: '/',
                     });
 
                     res.status(200).json({ msg: 'Вход выполнен' })
@@ -347,7 +351,8 @@ router.post('/login', async (req, res) => {
                     httpOnly: true,
                     secure: isProduction, // process.env.SECURE_COOKIE === 'production', // true только в продакшене
                     sameSite: isProduction ? 'none' : 'lax', // Для локальной разработки на разных портах
-                    maxAge: 24 * 60 * 60 * 1000 // 24 часа в миллисекундах
+                    maxAge: 24 * 60 * 60 * 1000, // 24 часа в миллисекундах
+                    path: '/',
                 });
 
 
@@ -447,7 +452,8 @@ router.post('/login/resetpassword/verify', async (req, res) => {
                         httpOnly: true, // Запрещает доступ к куке через свойство document.cookie
                         secure: isProduction, // process.env.SECURE_COOKIE === 'production', // true только в продакшене
                         sameSite: isProduction ? 'none' : 'lax', // Для локальной разработки на разных портах
-                        maxAge: 24 * 60 * 60 * 1000 // 24 часа в миллисекундах
+                        maxAge: 24 * 60 * 60 * 1000, // 24 часа в миллисекундах
+                        path: '/',
                     });
 
                     res.status(200).json({msg: 'Пароль успешно обновлён'})
