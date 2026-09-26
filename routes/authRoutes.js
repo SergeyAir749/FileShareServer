@@ -139,16 +139,7 @@ router.post('/signup', async (req, res) => {
 
                 const isProduction = process.env.SECURE_COOKIE === 'production';
 
-                res.cookie('token', token, {
-                    httpOnly: true,
-                    secure: isProduction, // process.env.SECURE_COOKIE === 'production', // true только в продакшене
-                    sameSite: isProduction ? 'lax' : 'lax', // Для локальной разработки на разных портах
-                    maxAge: 24 * 60 * 60 * 1000, // 24 часа в миллисекундах
-                    path: '/',
-                });
-
-
-                res.status(200).json({msg: 'Пользователь успешно зарегистрирован'})
+                res.status(200).json({msg: 'Пользователь успешно зарегистрирован', token: token})
 
             }
         }
@@ -180,23 +171,23 @@ router.post('/signup/guest', async (req, res) => {
 
         const isProduction = process.env.SECURE_COOKIE === 'production';
         
-        res.cookie('token', token, {
-            secure: isProduction === 'production', // true только в продакшене
-            maxAge: 60 * 60 * 24 * 365, // 365 дней в милисикундах
-            httpOnly: true,
-            sameSite: isProduction ? 'lax' : 'lax', // Для локальной разработки на разных портах
-            path: '/',
-        });
+        // res.cookie('token', token, {
+        //     secure: isProduction === 'production', // true только в продакшене
+        //     maxAge: 60 * 60 * 24 * 365, // 365 дней в милисикундах
+        //     httpOnly: true,
+        //     sameSite: isProduction ? 'lax' : 'lax', // Для локальной разработки на разных портах
+        //     path: '/',
+        // });
 
-        res.cookie('recoveringGuestToken', token, {
-            httpOnly: true,
-            secure: isProduction, // true только в продакшене
-            sameSite: isProduction ? 'lax' : 'lax', // Для локальной разработки на разных портах
-            maxAge: 60 * 60 * 24 * 365, // 365 дней в милисикундах
-            path: '/',
-        });
+        // res.cookie('recoveringGuestToken', token, {
+        //     httpOnly: true,
+        //     secure: isProduction, // true только в продакшене
+        //     sameSite: isProduction ? 'lax' : 'lax', // Для локальной разработки на разных портах
+        //     maxAge: 60 * 60 * 24 * 365, // 365 дней в милисикундах
+        //     path: '/',
+        // });
 
-        res.status(200).json({ msg: 'Гостивой аккаунт зарегистрирован' })
+        res.status(200).json({ msg: 'Гостивой аккаунт зарегистрирован', token: token})
 
     } catch (error) {
         res.status(500).json({msg: error.message})
@@ -307,23 +298,8 @@ router.post('/login', async (req, res) => {
                 console.log(passwordValed);
 
                 if (passwordValed != false) {
-
                     const token = jwt.sign({id: userData._id}, process.env.JWT_SECRET_KEY, {expiresIn: "24h"})
-
-                    const isProduction = process.env.SECURE_COOKIE === 'production';
-
-                    console.log(process.env.SECURE_COOKIE === 'production');
-                    
-                    res.cookie('token', token, {
-                        httpOnly: true,
-                        secure: isProduction, // process.env.SECURE_COOKIE === 'production', // true только в продакшене
-                        sameSite: isProduction ? 'lax' : 'lax', // Для локальной разработки на разных портах
-                        maxAge: 24 * 60 * 60 * 1000, // 24 часа в миллисекундах
-                        path: '/',
-                    });
-
-                    res.status(200).json({ msg: 'Вход выполнен' })
-                    // res.status(200).json({token: token})
+                    res.status(200).json({ msg: 'Вход выполнен', token: token})
                 } else {
                     res.status(400).json({msg: "incorrectPassword"})
                 }
@@ -339,24 +315,10 @@ router.post('/login', async (req, res) => {
                 userData.codeExpires = expirationTime,
 
                 await sendVerificationSignUpCode(userData.email, code, lang)
-
                 await userData.save()
 
-
                 const token = jwt.sign({id: userData._id}, process.env.JWT_SECRET_KEY, {expiresIn: "24h"})
-
-                const isProduction = process.env.SECURE_COOKIE === 'production';
-
-                res.cookie('token', token, {
-                    httpOnly: true,
-                    secure: isProduction, // process.env.SECURE_COOKIE === 'production', // true только в продакшене
-                    sameSite: isProduction ? 'lax' : 'lax', // Для локальной разработки на разных портах
-                    maxAge: 24 * 60 * 60 * 1000, // 24 часа в миллисекундах
-                    path: '/',
-                });
-
-
-                res.status(400).json({msg: "emailNotVerified"})
+                res.status(400).json({msg: "emailNotVerified", token: token})
             }
 
         }
@@ -448,15 +410,15 @@ router.post('/login/resetpassword/verify', async (req, res) => {
 
                     const isProduction = process.env.SECURE_COOKIE === 'production';
 
-                    res.cookie('token', token, {
-                        httpOnly: true, // Запрещает доступ к куке через свойство document.cookie
-                        secure: isProduction, // process.env.SECURE_COOKIE === 'production', // true только в продакшене
-                        sameSite: isProduction ? 'lax' : 'lax', // Для локальной разработки на разных портах
-                        maxAge: 24 * 60 * 60 * 1000, // 24 часа в миллисекундах
-                        path: '/',
-                    });
+                    // res.cookie('token', token, {
+                    //     httpOnly: true, // Запрещает доступ к куке через свойство document.cookie
+                    //     secure: isProduction, // process.env.SECURE_COOKIE === 'production', // true только в продакшене
+                    //     sameSite: isProduction ? 'lax' : 'lax', // Для локальной разработки на разных портах
+                    //     maxAge: 24 * 60 * 60 * 1000, // 24 часа в миллисекундах
+                    //     path: '/',
+                    // });
 
-                    res.status(200).json({msg: 'Пароль успешно обновлён'})
+                    res.status(200).json({msg: 'Пароль успешно обновлён', token: token})
                 }
 
             } else {

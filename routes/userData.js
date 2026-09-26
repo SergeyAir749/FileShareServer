@@ -143,15 +143,15 @@ router.get('/getUserData', authMidelwares, async (req, res, next) => {
 
             const isProduction = process.env.SECURE_COOKIE === 'production';
 
-            res.cookie('token', token, {
-                httpOnly: true,
-                secure: isProduction, // process.env.SECURE_COOKIE === 'production', // true только в продакшене
-                sameSite: isProduction ? 'lax' : 'lax', // Для локальной разработки на разных портах
-                maxAge: 24 * 60 * 60 * 1000, // 24 часа в миллисекундах
-                path: '/',
-            });
+            // res.cookie('token', token, {
+            //     httpOnly: true,
+            //     secure: isProduction, // process.env.SECURE_COOKIE === 'production', // true только в продакшене
+            //     sameSite: isProduction ? 'lax' : 'lax', // Для локальной разработки на разных портах
+            //     maxAge: 24 * 60 * 60 * 1000, // 24 часа в миллисекундах
+            //     path: '/',
+            // });
 
-            res.status(500).json({msg: "emailNotVerified"})
+            res.status(500).json({msg: "emailNotVerified", token: token})
             
         } else if (user != null && user.isDelete == true) {
 
@@ -450,16 +450,16 @@ router.post('/account/recovering/verification', authMidelwares, async (req, res,
 
                     console.log(process.env.SECURE_COOKIE === 'production');
                     
-                    res.cookie('token', token, {
-                        httpOnly: true,
-                        secure: isProduction, // process.env.SECURE_COOKIE === 'production', // true только в продакшене
-                        sameSite: isProduction ? 'lax' : 'lax', // Для локальной разработки на разных портах
-                        maxAge: 24 * 60 * 60 * 1000, // 24 часа в миллисекундах
-                        path: '/',
-                    });
+                    // res.cookie('token', token, {
+                    //     httpOnly: true,
+                    //     secure: isProduction, // process.env.SECURE_COOKIE === 'production', // true только в продакшене
+                    //     sameSite: isProduction ? 'lax' : 'lax', // Для локальной разработки на разных портах
+                    //     maxAge: 24 * 60 * 60 * 1000, // 24 часа в миллисекундах
+                    //     path: '/',
+                    // });
                     
 
-                    res.status(200).json({msg: 'Аккаунты восстановлен'})
+                    res.status(200).json({msg: 'Аккаунты восстановлен', token: token})
 
                 }
 
@@ -484,6 +484,9 @@ router.post('/account/recovering', async (req, res, next) => {
 
     const {email, username, password, lang} = req.body
     let userData = null
+
+    console.log(req.body);
+    
 
     try {
          
@@ -523,17 +526,17 @@ router.post('/account/recovering', async (req, res, next) => {
 
                     const isProduction = process.env.SECURE_COOKIE === 'production';
                     
-                    res.cookie('token', token, {
-                        secure: isProduction, // true только в продакшене
-                        maxAge: 24 * 60 * 60 * 1000, // 24 часа в миллисекундах
-                        httpOnly: true,
-                        sameSite: isProduction ? 'lax' : 'lax', // Для локальной разработки на разных портах
-                        path: '/',
-                    });
+                    // res.cookie('token', token, {
+                    //     secure: isProduction, // true только в продакшене
+                    //     maxAge: 24 * 60 * 60 * 1000, // 24 часа в миллисекундах
+                    //     httpOnly: true,
+                    //     sameSite: isProduction ? 'lax' : 'lax', // Для локальной разработки на разных портах
+                    //     path: '/',
+                    // });
     
                     userData.save()
     
-                    res.status(200).json({msg: 'Введите код из почты чтоб завершить восстановление'})
+                    res.status(200).json({msg: 'Введите код из почты чтоб завершить восстановление', token: token})
                 } else {
                     res.status(400).json({msg: "incorrectPassword"})
                 }
