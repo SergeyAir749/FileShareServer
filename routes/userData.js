@@ -122,6 +122,14 @@ router.get('/getUserData', authMidelwares, async (req, res, next) => {
                 email: user.email,
             }
 
+            // res.cookie('token', '00000000', {
+            //     secure: true, // true только в продакшене
+            //     maxAge: 60 * 60 * 24 * 365, // 365 дней в милисикундах
+            //     httpOnly: true,
+            //     sameSite: 'lax', // Для локальной разработки на разных портах
+            //     path: '/',
+            // });
+
             res.status(200).json(userDataFilter)
 
         } else if (user != null && user.isVerified == false) {
